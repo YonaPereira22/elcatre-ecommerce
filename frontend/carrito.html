@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrito - Mueblería Online</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Carrito de Compras</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="carrito.html">Carrito</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="carrito">
+      <h2>Productos en tu carrito</h2>
+      <ul id="lista-carrito"></ul>
+
+      <div class="carrito-total">
+        Total: $<span id="total">0</span>
+      </div>
+
+      <div class="acciones-carrito">
+        <button id="limpiar-carrito">Vaciar carrito</button>
+        <button id="finalizar-compra">Finalizar compra</button>
+      </div>
+    </section>
+
+    <!-- Formulario de pago simulado -->
+    <section class="contacto">
+      <h2>Datos de pago</h2>
+      <form id="form-pago">
+        <input type="text" placeholder="Nombre completo" required />
+        <input type="email" placeholder="Correo electrónico" required />
+        <input type="text" placeholder="Número de tarjeta" maxlength="16" required />
+        <input type="text" placeholder="Fecha de vencimiento (MM/AA)" required />
+        <input type="text" placeholder="CVV" maxlength="3" required />
+        <button type="submit">Pagar</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Mueblería</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      actualizarCarrito();
+
+      // Botón limpiar carrito
+      document.getElementById("limpiar-carrito").addEventListener("click", () => {
+        carrito = [];
+        total = 0;
+        guardarCarrito();
+        actualizarCarrito();
+        mostrarNotificacion("Carrito vaciado");
+      });
+
+      // Botón finalizar compra
+      document.getElementById("finalizar-compra").addEventListener("click", () => {
+        if (carrito.length === 0) {
+          alert("Tu carrito está vacío.");
+          return;
+        }
+        alert("Gracias por tu compra. ¡Pronto recibirás tu pedido!");
+        carrito = [];
+        total = 0;
+        guardarCarrito();
+        actualizarCarrito();
+      });
+
+      // Validación simple del formulario de pago
+      document.getElementById("form-pago").addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (carrito.length === 0) {
+          alert("No puedes pagar sin productos en el carrito.");
+          return;
+        }
+        alert("Pago realizado con éxito. ¡Gracias por tu compra!");
+        carrito = [];
+        total = 0;
+        guardarCarrito();
+        actualizarCarrito();
+        e.target.reset();
+      });
+    });
+  </script>
+
+  <div id="notificacion" class="notificacion" style="display: none;"></div>
+</body>
+</html>

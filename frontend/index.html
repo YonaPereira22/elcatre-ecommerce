@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mueblería Online</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Mueblería Online</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="carrito.html">Carrito</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="filtros">
+      <input type="text" id="buscador" placeholder="Buscar producto..." />
+
+      <!-- Botones de categorías -->
+      <div class="categorias">
+        <button onclick="filtrarCategoria('todos')">Todos</button>
+        <button onclick="filtrarCategoria('sillas')">Sillas</button>
+        <button onclick="filtrarCategoria('mesas')">Mesas</button>
+        <button onclick="filtrarCategoria('estanterias')">Estanterías</button>
+        <button onclick="filtrarCategoria('sofas')">Sofás</button>
+        <button onclick="filtrarCategoria('camas')">Camas</button>
+        <button onclick="filtrarCategoria('escritorios')">Escritorios</button>
+      </div>
+    </section>
+
+    <section id="productos">
+      <h2>Catálogo</h2>
+      <div id="contenedor-productos" class="contenedor-productos"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Mueblería</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <div id="notificacion" class="notificacion" style="display: none;"></div>
+</body>
+</html>
