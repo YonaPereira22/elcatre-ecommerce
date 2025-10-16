@@ -3,97 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carrito - Mueblería Online</title>
+  <title>Carrito — El Catre S.R.L</title>
+  <meta name="description" content="Carrito de compras — El Catre S.R.L">
+  <link rel="icon" href="img/logo-el-catre.jpg" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>Carrito de Compras</h1>
-    <nav>
+  <header class="site-header" role="banner">
+    <a class="brand" href="index.html" aria-label="Ir al inicio">
+      <img src="img/logo-el-catre.jpg" alt="Logo El Catre S.R.L" class="brand-logo" />
+      <span class="brand-name">El Catre S.R.L</span>
+    </a>
+    <nav aria-label="Principal" class="main-nav">
       <ul>
         <li><a href="index.html">Inicio</a></li>
-        <li><a href="carrito.html">Carrito</a></li>
+        <li><a href="carrito.html" aria-current="page">Carrito</a></li>
       </ul>
     </nav>
   </header>
 
-  <main>
-    <section class="carrito">
-      <h2>Productos en tu carrito</h2>
-      <ul id="lista-carrito"></ul>
-
+  <main role="main">
+    <section class="carrito card">
+      <h1>Carrito de compras</h1>
+      <ul id="lista-carrito" class="lista-carrito" aria-live="polite"></ul>
       <div class="carrito-total">
-        Total: $<span id="total">0</span>
+        Total: <strong>UYU <span id="total">0</span></strong>
       </div>
-
       <div class="acciones-carrito">
-        <button id="limpiar-carrito">Vaciar carrito</button>
-        <button id="finalizar-compra">Finalizar compra</button>
+        <button id="limpiar-carrito" class="btn-secondary">Vaciar carrito</button>
+        <button id="finalizar-compra" class="btn-primary">Finalizar compra</button>
       </div>
     </section>
 
-    <!-- Formulario de pago simulado -->
-    <section class="contacto">
-      <h2>Datos de pago</h2>
-      <form id="form-pago">
-        <input type="text" placeholder="Nombre completo" required />
-        <input type="email" placeholder="Correo electrónico" required />
-        <input type="text" placeholder="Número de tarjeta" maxlength="16" required />
-        <input type="text" placeholder="Fecha de vencimiento (MM/AA)" required />
-        <input type="text" placeholder="CVV" maxlength="3" required />
-        <button type="submit">Pagar</button>
+    <section class="contacto card">
+      <h2>Datos de pago (simulado)</h2>
+      <form id="form-pago" class="form-grid" novalidate>
+        <input type="text" id="nombre" placeholder="Nombre y Apellido" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="text" id="tarjeta" placeholder="N° tarjeta (16 dígitos)" pattern="\\d{16}" required />
+        <input type="text" id="cvv" placeholder="CVV (3 dígitos)" pattern="\\d{3}" required />
+        <input type="text" id="venc" placeholder="Vencimiento (MM/AA)" pattern="(0[1-9]|1[0-2])\\/\\d{2}" required />
+        <button type="submit" class="btn-primary">Pagar</button>
       </form>
+      <p class="aviso">* Simulación académica. No se procesa ningún pago real.</p>
     </section>
   </main>
 
-  <footer>
-    <p>&copy; 2025 Mueblería</p>
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-brand">
+      <img src="img/logo-el-catre.jpg" alt="Logo El Catre S.R.L" />
+      <div>
+        <strong>El Catre S.R.L</strong><br>
+        Mueblería — Calidad y servicio
+      </div>
+    </div>
+    <div class="footer-links">
+      <a class="btn-ig small" href="https://www.instagram.com/elcatre.srl?igsh=MTczNXJxeDJocDBycg==" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" class="ig-icon" aria-hidden="true"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2C5.57 4 4 5.57 4 7.5v9C4 18.43 5.57 20 7.5 20h9c1.93 0 3.5-1.57 3.5-3.5v-9C20 5.57 18.43 4 16.5 4h-9zm12 1.75a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 .001 6.001A3 3 0 0 0 12 9z"/></svg>
+        <span>Instagram</span>
+      </a>
+    </div>
   </footer>
 
+  <div id="notificacion" class="notificacion" style="display:none;" role="status" aria-live="polite"></div>
   <script src="data.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      actualizarCarrito();
-
-      // Botón limpiar carrito
-      document.getElementById("limpiar-carrito").addEventListener("click", () => {
-        carrito = [];
-        total = 0;
-        guardarCarrito();
-        actualizarCarrito();
-        mostrarNotificacion("Carrito vaciado");
-      });
-
-      // Botón finalizar compra
-      document.getElementById("finalizar-compra").addEventListener("click", () => {
-        if (carrito.length === 0) {
-          alert("Tu carrito está vacío.");
-          return;
-        }
-        alert("Gracias por tu compra. ¡Pronto recibirás tu pedido!");
-        carrito = [];
-        total = 0;
-        guardarCarrito();
-        actualizarCarrito();
-      });
-
-      // Validación simple del formulario de pago
-      document.getElementById("form-pago").addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (carrito.length === 0) {
-          alert("No puedes pagar sin productos en el carrito.");
-          return;
-        }
-        alert("Pago realizado con éxito. ¡Gracias por tu compra!");
-        carrito = [];
-        total = 0;
-        guardarCarrito();
-        actualizarCarrito();
-        e.target.reset();
-      });
-    });
-  </script>
-
-  <div id="notificacion" class="notificacion" style="display: none;"></div>
 </body>
 </html>

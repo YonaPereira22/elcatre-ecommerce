@@ -1,106 +1,197 @@
-let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-let total = parseFloat(localStorage.getItem("total")) || 0;
+/***********************
+ *   CONFIG INICIAL    *
+ ***********************/
+const N_IMAGES = 34;                  // cantidad de imágenes
+const FOLDER   = "img";               // carpeta de imágenes
+const BASENAME = "Image";             // prefijo
+const EXT      = ".jpg";              // extensión
+const PAD2     = true;                // Image 01.jpg
+const START_AT = 1;
 
-// Productos ficticios (reemplazá las imágenes con las reales en /img)
-const productos = [
-  { id: 1, nombre: "Silla moderna", precio: 120, categoria: "sillas", imagen: "img/silla1.jpg" },
-  { id: 2, nombre: "Silla de madera", precio: 150, categoria: "sillas", imagen: "img/silla2.jpg" },
-  { id: 3, nombre: "Mesa comedor", precio: 300, categoria: "mesas", imagen: "img/mesa1.jpg" },
-  { id: 4, nombre: "Mesa ratona", precio: 180, categoria: "mesas", imagen: "img/mesa2.jpg" },
-  { id: 5, nombre: "Estantería metálica", precio: 200, categoria: "estanterias", imagen: "img/estanteria1.jpg" },
-  { id: 6, nombre: "Estantería de madera", precio: 250, categoria: "estanterias", imagen: "img/estanteria2.jpg" },
-  { id: 7, nombre: "Sofá 2 cuerpos", precio: 500, categoria: "sofas", imagen: "img/sofa1.jpg" },
-  { id: 8, nombre: "Cama matrimonial", precio: 700, categoria: "camas", imagen: "img/cama1.jpg" },
-  { id: 9, nombre: "Escritorio gamer", precio: 400, categoria: "escritorios", imagen: "img/escritorio1.jpg" },
-  { id: 10, nombre: "Escritorio clásico", precio: 280, categoria: "escritorios", imagen: "img/escritorio2.jpg" }
+/* Categorías que usás en el sitio (mueblería) */
+const CATEGORIAS = [
+  { key: "sillas", nombre: "Sillas", rango: [2500, 6000] },
+  { key: "mesas", nombre: "Mesas", rango: [8000, 12000] },
+  { key: "estanterias", nombre: "Estanterías", rango: [3500, 7000] },
+  { key: "sofas", nombre: "Sofás", rango: [20000, 30000] },
+  { key: "camas", nombre: "Camas", rango: [12000, 26000] },
+  { key: "escritorios", nombre: "Escritorios", rango: [5000, 9000] },
+  { key: "placares", nombre: "Placares", rango: [11000, 19000] },
+  { key: "roperos", nombre: "Roperos", rango: [10000, 17000] }
 ];
 
-function guardarCarrito() {
+/* Utilidades */
+function precioAlAzar([min, max]) { const step=10; return Math.round((Math.random()*(max-min)+min)/step)*step; }
+function pad(n){ return PAD2 ? n.toString().padStart(2,"0") : n; }
+function buildFilename(i){ return `${FOLDER}/${BASENAME} ${pad(i)}${EXT}`; }
+
+/********************************************
+ *        CATALOGO + OVERRIDES (fijos)      *
+ ********************************************/
+/* Base inicial (reparte categorías en ciclo, solo para arrancar) */
+function generarBase(){
+  const prods = [];
+  for(let i=START_AT;i<START_AT+N_IMAGES;i++){
+    const cat = CATEGORIAS[(i-START_AT)%CATEGORIAS.length];
+    const nombre = `${cat.nombre} ${i}`;
+    prods.push({
+      id:i, nombre, categoria:cat.key,
+      precio: precioAlAzar(cat.rango),
+      imagen: buildFilename(i),
+      alt: nombre
+    });
+  }
+  return prods;
+}
+
+/* Pega acá el JSON que copiaste de la consola (localStorage 'catalog_overrides') */
+const OVERRIDES_JSON = 
+/* ======= PASTE OVERRIDES HERE (por ejemplo: {"1":{"nombre":"Silla Eames","categoria":"sillas"}} ) ======= */ 
+{};
+/* =============================================================================================== */
+
+function aplicarOverrides(base){
+  let overrides = {};
+  try { overrides = (typeof OVERRIDES_JSON === 'string') ? JSON.parse(OVERRIDES_JSON) : OVERRIDES_JSON; }
+  catch(_) { overrides = {}; }
+  return base.map(p=>{
+    const o = overrides[p.id];
+    if(!o) return p;
+    return {...p, ...o, alt: o.nombre || p.nombre};
+  });
+}
+
+/********************************************
+ *                 ESTADO                   *
+ ********************************************/
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let total   = parseFloat(localStorage.getItem("total")) || 0;
+
+function guardarCarrito(){
   localStorage.setItem("carrito", JSON.stringify(carrito));
   localStorage.setItem("total", total);
 }
 
-function agregarAlCarrito(nombre, precio) {
-  carrito.push({ nombre, precio });
+/********************************************
+ *                RENDER UI                 *
+ ********************************************/
+function categoriasUnicas(productos){
+  const set = new Set(productos.map(p=>p.categoria));
+  return ["todos", ...Array.from(set)];
+}
+
+function renderTabs(productos){
+  const cont = document.getElementById("tabs-categorias");
+  if(!cont) return;
+  const cats = categoriasUnicas(productos);
+  cont.innerHTML = cats.map(c=>{
+    const label = c==="todos" ? "Todos" : (CATEGORIAS.find(x=>x.key===c)?.nombre || c);
+    return `<button data-cat="${c}" ${c==="todos"?'class="active"':''}>${label}</button>`;
+  }).join("");
+  cont.querySelectorAll("button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      cont.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      const cat = btn.getAttribute("data-cat");
+      const q = document.getElementById("buscador")?.value || "";
+      renderCatalogo(productos, q, cat);
+    });
+  });
+}
+
+function renderCatalogo(productos, filtroNombre="", filtroCategoria="todos"){
+  const cont = document.getElementById("contenedor-productos");
+  if(!cont) return;
+
+  const filtrados = productos.filter(p =>
+    (filtroCategoria==="todos" || p.categoria===filtroCategoria) &&
+    p.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
+  );
+
+  cont.innerHTML = filtrados.map(p=>{
+    return `
+    <div class="producto">
+      <img src="${p.imagen}" alt="${p.alt}">
+      <h3>${p.nombre}</h3>
+      <div class="meta">
+        <p>UYU ${p.precio.toLocaleString("es-UY")}</p>
+      </div>
+      <button onclick="agregarAlCarrito('${p.nombre}', ${p.precio})">Agregar al carrito</button>
+    </div>`;
+  }).join("");
+}
+
+/********************************************
+ *              ACCIONES                     *
+ ********************************************/
+function agregarAlCarrito(nombre, precio){
+  carrito.push({nombre, precio});
   total += precio;
   guardarCarrito();
   actualizarCarrito();
   mostrarNotificacion(`${nombre} agregado al carrito`);
 }
-
-function mostrarNotificacion(mensaje) {
-  const noti = document.getElementById("notificacion");
-  if (!noti) return;
-
-  noti.textContent = mensaje;
-  noti.style.display = "block";
-  noti.style.opacity = "1";
-
-  setTimeout(() => {
-    noti.style.opacity = "0";
-    setTimeout(() => {
-      noti.style.display = "none";
-    }, 500);
-  }, 2000);
+function quitarDelCarrito(index){
+  total -= carrito[index].precio;
+  carrito.splice(index,1);
+  guardarCarrito();
+  actualizarCarrito();
 }
-
-function actualizarCarrito() {
+function actualizarCarrito(){
   const lista = document.getElementById("lista-carrito");
   const totalSpan = document.getElementById("total");
+  if(!lista || !totalSpan) return;
 
-  if (!lista || !totalSpan) return;
+  lista.innerHTML = carrito.map((item,i)=>`
+    <li>
+      <span>${item.nombre}</span>
+      <span>UYU ${item.precio.toLocaleString("es-UY")}</span>
+      <button onclick="quitarDelCarrito(${i})" class="btn-secondary">Quitar</button>
+    </li>
+  `).join("");
 
-  lista.innerHTML = "";
-  carrito.forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = `${item.nombre} - $${item.precio}`;
-    lista.appendChild(li);
-  });
+  totalSpan.textContent = (total||0).toLocaleString("es-UY");
 
-  totalSpan.textContent = total.toFixed(2);
+  const btnLimpiar   = document.getElementById("limpiar-carrito");
+  const btnFinalizar = document.getElementById("finalizar-compra");
+  if(btnLimpiar) btnLimpiar.onclick = ()=>{ carrito=[]; total=0; guardarCarrito(); actualizarCarrito(); };
+  if(btnFinalizar) btnFinalizar.onclick = ()=>{
+    const ok = confirm("¿Confirmás la compra? (Simulación académica)");
+    if(ok){ carrito=[]; total=0; guardarCarrito(); actualizarCarrito(); alert("¡Gracias por tu compra!"); }
+  };
+
+  const form = document.getElementById("form-pago");
+  if(form){
+    form.addEventListener("submit",(e)=>{
+      e.preventDefault();
+      if(!form.checkValidity()){ alert("Revisá los campos del formulario."); return; }
+      alert("Pago validado (simulación). ¡Pedido confirmado!");
+      carrito=[]; total=0; guardarCarrito(); actualizarCarrito();
+    }, { once:true });
+  }
 }
 
-// Renderizar productos
-function renderizarProductos(filtroNombre = "", filtroCategoria = "todos") {
-  const contenedor = document.getElementById("contenedor-productos");
-  contenedor.innerHTML = "";
-
-  const filtrados = productos.filter(p =>
-    (filtroCategoria === "todos" || p.categoria === filtroCategoria) &&
-    p.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
-  );
-
-  filtrados.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "producto";
-    div.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}">
-      <h3>${p.nombre}</h3>
-      <p>Precio: $${p.precio}</p>
-      <button onclick="agregarAlCarrito('${p.nombre}', ${p.precio})">Agregar al carrito</button>
-    `;
-    contenedor.appendChild(div);
-  });
+function mostrarNotificacion(msg){
+  const n = document.getElementById("notificacion");
+  if(!n) return;
+  n.textContent = msg;
+  n.style.display = "block";
+  setTimeout(()=> n.style.display = "none", 1500);
 }
 
-// Filtros
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("contenedor-productos")) {
-    renderizarProductos();
+/********************************************
+ *                  BOOT                     *
+ ********************************************/
+function boot(){
+  const base = generarBase();
+  const productos = aplicarOverrides(base);
+  renderTabs(productos);
+  const q = document.getElementById("buscador")?.value || "";
+  const active = document.querySelector(".categorias button.active")?.getAttribute("data-cat") || "todos";
+  renderCatalogo(productos, q, active);
+}
 
-    document.getElementById("buscador").addEventListener("input", (e) => {
-      const texto = e.target.value;
-      renderizarProductos(texto);
-    });
-  }
-
-  if (document.getElementById("lista-carrito")) {
-    actualizarCarrito();
-  }
+document.addEventListener("DOMContentLoaded", ()=>{
+  if(document.getElementById("lista-carrito")) actualizarCarrito();
+  boot();
 });
-
-// Función global para botones de categorías
-function filtrarCategoria(categoria) {
-  const texto = document.getElementById("buscador").value;
-  renderizarProductos(texto, categoria);
-}
