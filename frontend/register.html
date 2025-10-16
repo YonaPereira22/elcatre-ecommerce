@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Registrarse — El Catre S.R.L</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .card{max-width:420px;margin:40px auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .card h1{margin:0 0 12px}
+    .form-group{margin:12px 0}
+    label{display:block;margin-bottom:6px}
+    input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px}
+    .btn{margin-top:12px;width:100%;padding:12px;border:0;border-radius:10px;background:#17468f;color:#fff;font-weight:600;cursor:pointer}
+    .link{display:block;text-align:center;margin-top:12px}
+    .msg{margin-top:10px;color:#c00}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Crear cuenta</h1>
+    <div class="form-group">
+      <label>Nombre</label>
+      <input id="nombre" placeholder="Tu nombre">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input id="email" type="email" placeholder="tu@correo.com">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input id="password" type="password" placeholder="mínimo 6 caracteres">
+    </div>
+    <button class="btn" id="btn">Registrarme</button>
+    <div class="msg" id="msg"></div>
+    <a class="link" href="login.html">¿Ya tenés cuenta? Iniciar sesión</a>
+  </div>
+
+  <script>
+    const API = '../backend/api.php';
+    document.getElementById('btn').onclick = async ()=>{
+      const nombre = document.getElementById('nombre').value.trim();
+      const email  = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('msg');
+      msg.textContent = '';
+      try{
+        const body = new URLSearchParams({action:'auth_register', nombre, email, password});
+        const r = await fetch(API, {method:'POST', body});
+        const j = await r.json();
+        if(!r.ok){ msg.textContent = j.error || 'Error'; return; }
+        // OK -> ir al inicio
+        location.href = 'index.html';
+      }catch(e){ msg.textContent = 'Error de red'; }
+    };
+  </script>
+</body>
+</html>

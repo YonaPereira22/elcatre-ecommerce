@@ -1,90 +1,159 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
   <title>El Catre S.R.L — Mueblería</title>
-  <meta name="description" content="El Catre S.R.L — Mueblería. Catálogo online con filtros y carrito.">
-  <link rel="icon" href="img/logo-el-catre.jpg" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root{--azul:#17468f;--azul2:#0f3266;--blanco:#fff;--gris:#f3f5f7;--tx:#111}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#f7f9ff 0%,#fff 100%);color:var(--tx)}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1100px;margin:0 auto;padding:0 16px}
+
+    /* NAV */
+    .topbar{position:sticky;top:0;z-index:40;background:var(--azul);color:#fff;border-bottom:1px solid rgba(255,255,255,.1)}
+    .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand img{height:34px;border-radius:6px}
+    .brand strong{font-size:18px;letter-spacing:.3px}
+    .menu{display:flex;gap:10px;flex-wrap:wrap}
+    .menu a{padding:8px 10px;border-radius:8px}
+    .menu a:hover{background:rgba(255,255,255,.12)}
+    .auth{display:flex;gap:8px;align-items:center}
+    .btn{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;cursor:pointer;font-weight:600}
+    .btn.white{background:#fff;color:var(--azul);border-color:#fff}
+
+    /* HERO */
+    .hero{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:stretch;padding:16px 0}
+    .hero video{width:100%;height:360px;object-fit:cover;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .side{display:flex;flex-direction:column;gap:12px;justify-content:center}
+    .side h2{margin:0 0 6px;font-size:36px;color:var(--azul)}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid #dbe2ea;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.05);font-weight:600}
+    .pill img{width:18px;height:18px}
+    .insta{color:#C13584}
+    .wa{color:#128C7E}
+
+    /* TOOLS */
+    .tools{background:var(--gris);padding:14px 0;border-top:1px solid #e7ebf0;border-bottom:1px solid #e7ebf0}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    #buscador{flex:1;min-width:220px;padding:10px;border-radius:8px;border:1px solid #dbe2ea}
+    .categorias{display:flex;gap:8px;flex-wrap:wrap}
+    .categorias button{padding:8px 12px;border-radius:8px;border:1px solid #dbe2ea;background:#fff;cursor:pointer}
+    .categorias button.active{background:var(--azul);color:#fff;border-color:var(--azul)}
+
+    /* GRID */
+    #contenedor-productos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;padding:20px 0}
+    .producto{background:#fff;border:1px solid #e8edf3;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.05)}
+    .producto img{width:100%;height:170px;object-fit:cover}
+    .producto h3{font-size:16px;margin:10px 12px}
+    .producto .meta{display:flex;justify-content:space-between;align-items:center;margin:0 12px 12px}
+    .producto button{margin:0 12px 14px 12px;width:calc(100% - 24px)}
+    footer{background:#0b1f42;color:#cfe1ff;padding:24px 0;margin-top:16px}
+    footer a{color:#cfe1ff;text-decoration:underline}
+    #notificacion{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;display:none}
+    @media (max-width:900px){.hero{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="site-header" role="banner">
-    <a class="brand" href="index.html" aria-label="Ir al inicio">
-      <img src="img/logo-el-catre.jpg" alt="Logo El Catre S.R.L" class="brand-logo" />
-      <span class="brand-name">El Catre S.R.L</span>
+
+<header class="topbar">
+  <div class="container wrap">
+    <a class="brand" href="index.html">
+      <img src="img/logo-el-catre.jpg" alt="El Catre S.R.L">
+      <strong>El Catre — Mueblería</strong>
     </a>
-
-    <nav aria-label="Principal" class="main-nav">
-      <ul>
-        <li><a href="index.html" aria-current="page">Inicio</a></li>
-        <li><a href="carrito.html">Carrito</a></li>
-      </ul>
+    <nav class="menu">
+      <a href="index.html">Inicio</a>
+      <a href="#catalogo">Productos</a>
+      <a href="carrito.html">Carrito</a>
+      <a href="https://wa.me/59844645043" target="_blank" rel="noopener">Contacto</a>
+      <a href="nosotros.html">Nosotros</a>
+      <a href="politicas.html">Políticas</a>
     </nav>
-  </header>
-
-  <main role="main">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-media">
-        <video
-          src="media/el-catre.mp4"
-          class="promo-video"
-          autoplay
-          muted
-          loop
-          playsinline
-          controls
-          poster="img/logo-el-catre.jpg"
-          aria-label="Video publicitario El Catre S.R.L">
-        </video>
-      </div>
-
-      <div class="hero-copy">
-        <h1>Mueblería</h1>
-        <p class="tagline">Calidad y servicio</p>
-
-        <!-- Instagram (URL real) -->
-        <a class="btn-ig" href="https://www.instagram.com/elcatre.srl?igsh=MTczNXJxeDJocDBycg==" target="_blank" rel="noopener" aria-label="Abrir Instagram de El Catre S.R.L">
-          <!-- Logo Instagram (SVG oficial) -->
-          <svg viewBox="0 0 24 24" class="ig-icon" aria-hidden="true">
-            <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2C5.57 4 4 5.57 4 7.5v9C4 18.43 5.57 20 7.5 20h9c1.93 0 3.5-1.57 3.5-3.5v-9C20 5.57 18.43 4 16.5 4h-9zm12 1.75a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 .001 6.001A3 3 0 0 0 12 9z"/>
-          </svg>
-          <span>Seguinos en Instagram</span>
-        </a>
-      </div>
-    </section>
-
-    <!-- FILTROS + CATÁLOGO -->
-    <section class="filtros" aria-label="Filtros de catálogo">
-      <input id="buscador" type="search" placeholder="Buscar producto..." aria-label="Buscar producto" />
-      <div class="categorias" role="tablist" aria-label="Categorías" id="tabs-categorias"></div>
-    </section>
-
-    <section class="catalogo">
-      <h2>Catálogo</h2>
-      <div id="contenedor-productos" class="contenedor-productos" aria-live="polite"></div>
-    </section>
-  </main>
-
-  <footer class="site-footer" role="contentinfo">
-    <div class="footer-brand">
-      <img src="img/logo-el-catre.jpg" alt="Logo El Catre S.R.L" />
-      <div>
-        <strong>El Catre S.R.L</strong><br>
-        Mueblería — Calidad y servicio
-      </div>
+    <div class="auth" id="auth-box">
+      <a class="btn" href="login.html">Login</a>
+      <a class="btn white" href="register.html">Registrarse</a>
     </div>
-    <div class="footer-links">
-      <a class="btn-ig small" href="https://www.instagram.com/elcatre.srl?igsh=MTczNXJxeDJocDBycg==" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" class="ig-icon" aria-hidden="true"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2C5.57 4 4 5.57 4 7.5v9C4 18.43 5.57 20 7.5 20h9c1.93 0 3.5-1.57 3.5-3.5v-9C20 5.57 18.43 4 16.5 4h-9zm12 1.75a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 .001 6.001A3 3 0 0 0 12 9z"/></svg>
-        <span>Instagram</span>
-      </a>
-    </div>
-  </footer>
+  </div>
+</header>
 
-  <div id="notificacion" class="notificacion" style="display:none;" role="status" aria-live="polite"></div>
-  <script src="data.js"></script>
+<section class="container hero">
+  <video src="media/el-catre.mp4" autoplay muted loop playsinline></video>
+  <aside class="side">
+    <h2>Mueblería</h2>
+    <div class="pill wa">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="">
+      <a href="https://wa.me/59844645043" target="_blank" rel="noopener">WhatsApp: 4464-5043</a>
+    </div>
+    <div class="pill insta">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="">
+      <a href="https://www.instagram.com/elcatre.srl" target="_blank" rel="noopener">@elcatre.srl</a>
+    </div>
+  </aside>
+</section>
+
+<section class="tools" id="catalogo">
+  <div class="container">
+    <div class="row">
+      <input id="buscador" type="search" placeholder="Buscar productos…">
+      <div id="tabs-categorias" class="categorias"></div>
+    </div>
+  </div>
+</section>
+
+<main class="container">
+  <div id="contenedor-productos"></div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>© El Catre S.R.L — Mueblería. Santa Clara de Olimar. Tel: 4464-5043</p>
+    <p>Seguinos en <a href="https://www.instagram.com/elcatre.srl" target="_blank">Instagram</a></p>
+  </div>
+</footer>
+
+<div id="notificacion"></div>
+
+<script>
+  const API = '../backend/api.php';
+
+  async function pintarAuth(){
+    try{
+      const r = await fetch(API+'?action=auth_me',{credentials:'include'});
+      const j = await r.json();
+      const box = document.getElementById('auth-box');
+      if(j.authenticated){
+        box.innerHTML = `
+          <span>Hola, <strong>${j.user.nombre}</strong></span>
+          <button class="btn" id="btn-logout">Cerrar sesión</button>
+        `;
+        document.getElementById('btn-logout').onclick = async ()=>{
+          await fetch(API,{method:'POST',body:new URLSearchParams({action:'auth_logout'}),credentials:'include'});
+          location.reload();
+        };
+      }else{
+        box.innerHTML = `<a class="btn" href="login.html">Login</a>
+                         <a class="btn white" href="register.html">Registrarse</a>`;
+      }
+    }catch(_){}
+  }
+
+  // Integración con tu data.js (cachear productos para el buscador)
+  let productosCache = [];
+  const _renderCatalogo = window.renderCatalogo;
+  window.renderCatalogo = function(productos, q='', cat='todos'){ productosCache=productos; return _renderCatalogo(productos,q,cat); };
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    pintarAuth();
+    const q = document.getElementById('buscador');
+    if(q){ q.addEventListener('input', ()=>{
+      const active = document.querySelector('.categorias button.active')?.getAttribute('data-cat') || 'todos';
+      renderCatalogo(productosCache || [], q.value, active);
+    });}
+  });
+</script>
+
+<script src="data.js"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@ const EXT      = ".jpg";              // extensión
 const PAD2     = true;                // Image 01.jpg
 const START_AT = 1;
 
-/* Categorías que usás en el sitio (mueblería) */
+/* Categorías del sitio */
 const CATEGORIAS = [
   { key: "sillas", nombre: "Sillas", rango: [2500, 6000] },
   { key: "mesas", nombre: "Mesas", rango: [8000, 12000] },
@@ -28,7 +28,6 @@ function buildFilename(i){ return `${FOLDER}/${BASENAME} ${pad(i)}${EXT}`; }
 /********************************************
  *        CATALOGO + OVERRIDES (fijos)      *
  ********************************************/
-/* Base inicial (reparte categorías en ciclo, solo para arrancar) */
 function generarBase(){
   const prods = [];
   for(let i=START_AT;i<START_AT+N_IMAGES;i++){
@@ -44,12 +43,8 @@ function generarBase(){
   return prods;
 }
 
-/* Pega acá el JSON que copiaste de la consola (localStorage 'catalog_overrides') */
-const OVERRIDES_JSON = 
-/* ======= PASTE OVERRIDES HERE (por ejemplo: {"1":{"nombre":"Silla Eames","categoria":"sillas"}} ) ======= */ 
-{};
-/* =============================================================================================== */
-
+/* Pega acá overrides desde consola si alguna vez los usás */
+const OVERRIDES_JSON = {};
 function aplicarOverrides(base){
   let overrides = {};
   try { overrides = (typeof OVERRIDES_JSON === 'string') ? JSON.parse(OVERRIDES_JSON) : OVERRIDES_JSON; }
@@ -108,17 +103,16 @@ function renderCatalogo(productos, filtroNombre="", filtroCategoria="todos"){
     p.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
   );
 
-  cont.innerHTML = filtrados.map(p=>{
-    return `
+  cont.innerHTML = filtrados.map(p=>`
     <div class="producto">
       <img src="${p.imagen}" alt="${p.alt}">
       <h3>${p.nombre}</h3>
       <div class="meta">
         <p>UYU ${p.precio.toLocaleString("es-UY")}</p>
       </div>
-      <button onclick="agregarAlCarrito('${p.nombre}', ${p.precio})">Agregar al carrito</button>
-    </div>`;
-  }).join("");
+      <button class="btn-primary" onclick="agregarAlCarrito('${p.nombre.replaceAll("'","\\'")}', ${p.precio})">Agregar al carrito</button>
+    </div>
+  `).join("");
 }
 
 /********************************************
@@ -155,9 +149,11 @@ function actualizarCarrito(){
   const btnLimpiar   = document.getElementById("limpiar-carrito");
   const btnFinalizar = document.getElementById("finalizar-compra");
   if(btnLimpiar) btnLimpiar.onclick = ()=>{ carrito=[]; total=0; guardarCarrito(); actualizarCarrito(); };
-  if(btnFinalizar) btnFinalizar.onclick = ()=>{
-    const ok = confirm("¿Confirmás la compra? (Simulación académica)");
-    if(ok){ carrito=[]; total=0; guardarCarrito(); actualizarCarrito(); alert("¡Gracias por tu compra!"); }
+
+  // 👉 AHORA redirige al Checkout
+  if(btnFinalizar) btnFinalizar.onclick = ()=>{ 
+    if(!carrito.length){ alert("Tu carrito está vacío."); return; }
+    window.location.href = "checkout.html";
   };
 
   const form = document.getElementById("form-pago");

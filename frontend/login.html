@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Iniciar sesión — El Catre S.R.L</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .card{max-width:420px;margin:40px auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .card h1{margin:0 0 12px}
+    .form-group{margin:12px 0} label{display:block;margin-bottom:6px}
+    input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px}
+    .btn{margin-top:12px;width:100%;padding:12px;border:0;border-radius:10px;background:#17468f;color:#fff;font-weight:600;cursor:pointer}
+    .sep{display:flex;align-items:center;gap:10px;margin:14px 0;color:#666}
+    .sep::before,.sep::after{content:"";height:1px;background:#e1e5ea;flex:1}
+    .msg{margin-top:10px;color:#c00}
+  </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="card">
+    <h1>Iniciar sesión</h1>
+
+    <!-- Email + password -->
+    <div class="form-group">
+      <label>Email</label>
+      <input id="email" type="email" placeholder="tu@correo.com">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input id="password" type="password" placeholder="••••••">
+    </div>
+    <button class="btn" id="btn">Entrar</button>
+
+    <div class="sep">o</div>
+
+    <!-- GOOGLE BUTTON -->
+    <div id="g_id_onload"
+         data-client_id="REEMPLAZA_AQUI_TU_CLIENT_ID.apps.googleusercontent.com"
+         data-callback="onGoogleCredential"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rect" data-logo_alignment="left"></div>
+
+    <div class="msg" id="msg"></div>
+    <p style="text-align:center;margin-top:12px">
+      ¿No tenés cuenta? <a href="register.html">Registrate</a>
+    </p>
+  </div>
+
+  <script>
+    const API = '../backend/api.php';
+    // Email + Password
+    document.getElementById('btn').onclick = async ()=>{
+      const email  = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('msg'); msg.textContent='';
+      try{
+        const body = new URLSearchParams({action:'auth_login', email, password});
+        const r = await fetch(API,{method:'POST',body,credentials:'include'});
+        const j = await r.json();
+        if(!r.ok){ msg.textContent = j.error || 'Error'; return; }
+        location.href = 'index.html';
+      }catch(e){ msg.textContent = 'Error de red'; }
+    };
+
+    // Google Identity callback
+    async function onGoogleCredential(resp){
+      const msg = document.getElementById('msg'); msg.textContent='';
+      try{
+        const body = new URLSearchParams({action:'auth_google', id_token: resp.credential});
+        const r = await fetch(API,{method:'POST',body,credentials:'include'});
+        const j = await r.json();
+        if(!r.ok){ msg.textContent = j.error || 'Error con Google'; return; }
+        location.href = 'index.html';
+      }catch(e){ msg.textContent = 'Error de red'; }
+    }
+    window.onGoogleCredential = onGoogleCredential;
+  </script>
+</body>
+</html>
